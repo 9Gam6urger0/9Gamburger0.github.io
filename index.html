@@ -1,1 +1,257 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Вращалка</title>
+  <style>
+    @font-face {
+      font-family: 'Comfortaa';
+      src: url('file:///E:/ProjectJS/Comfortaa.ttf') format('truetype');
+    }
+    body { margin: 0; background-color: #f0f0f0; font-family: 'Comfortaa', sans-serif; }
+    canvas { display: block; }
+    #toggleButton { position: absolute; top: 20px; left: 20px; padding: 15px 30px; font-size: 20px; }
+    #colorPicker { position: absolute; top: 54px; left: 225px; padding: 10px; font-size: 20px; display: none; z-index: 1; }
+    #colorButton { position: absolute; top: 20px; left: 225px; padding: 15px 30px; font-size: 20px; }
+    .menu { position: absolute; top: 78px; left: 21px; display: none; background-color: #cccccc; padding: 16px; }
+    .menu button { display: block; width: 150px; height: 60px; margin: 10px; background-color: #f0f0f0; color: #000000; font-size: 20px; border: none; }
+  </style>
+</head>
+<body>
+  <button id="toggleButton" onclick="toggleMenu()">Выбрать объект</button>
+  <input type="color" id="colorPicker" onchange="changeObjectColor()" style="display: none;">
+  <button id="colorButton" onclick="openColorPicker()">Выбрать цвет</button>
+  <div class="menu">
+    <button onclick="selectCube()">Куб</button>
+    <button onclick="selectIcosahedron()">Икосаэдр</button>
+    <button onclick="selectTorusKnot()">Тор</button>
+    <button onclick="selectTorus()">Торус</button>
+    <button onclick="selectCone()">Конус</button>
+    <button onclick="selectDodecahedron()">Додекаэдр</button>
+    <button onclick="selectOctahedron()">Октаэдр</button>
+    <button onclick="selectTriangle()">Треугольник</button>
+    <button onclick="selectParallelepiped()">Параллелепипед</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    let cube = createCube();
+    scene.add(cube);
+
+    const light = new THREE.PointLight(0xffffff, 1);
+    light.position.set(2, 0, 5);
+    scene.add(light);
+
+    camera.position.z = 5;
+
+    let rotateX = 0;
+    let rotateY = 0;
+
+    let lightX = 0;
+    let lightY = 0;
+
+    let selectedObject = cube;
+
+    function createCube() {
+      const geometry = new THREE.BoxGeometry();
+      const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createSpikyIcosahedron() {
+      const geometry = new THREE.IcosahedronGeometry(1, 0);
+      const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createTorusKnot() {
+      const geometry = new THREE.TorusKnotGeometry(1, 0.35, 100, 16);
+      const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createTorus() {
+      const geometry = new THREE.TorusGeometry(1, 0.35, 16, 100);
+      const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createCone() {
+      const geometry = new THREE.ConeGeometry(1, 2, 16);
+      const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createDodecahedron() {
+      const geometry = new THREE.DodecahedronGeometry(1, 0);
+      const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createOctahedron() {
+      const geometry = new THREE.OctahedronGeometry(1, 0);
+      const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+      return new THREE.Mesh(geometry, material);
+    }
+
+
+    function createTriangle() {
+      const geometry = new THREE.ConeGeometry(1, 1, 3);
+     const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createParallelepiped() {
+     const geometry = new THREE.BoxGeometry(1, 1, 2);
+     const material = new THREE.MeshStandardMaterial({ color: "#FFFFFF" });
+     return new THREE.Mesh(geometry, material);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (selectedObject) {
+        selectedObject.rotation.x += rotateX;
+        selectedObject.rotation.y += rotateY;
+      }
+
+      light.position.x += lightX;
+      light.position.y += lightY;
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    document.addEventListener('keydown', (event) => {
+      switch (event.code) {
+        case 'ArrowLeft':
+          rotateY = -0.05;
+          break;
+        case 'ArrowRight':
+          rotateY = 0.05;
+          break;
+        case 'ArrowUp':
+          rotateX = -0.05;
+          break;
+        case 'ArrowDown':
+          rotateX = 0.05;
+          break;
+        case 'KeyW':
+          lightY = 0.15;
+          break;
+        case 'KeyS':
+          lightY = -0.15;
+          break;
+        case 'KeyA':
+          lightX = -0.15;
+          break;
+        case 'KeyD':
+          lightX = 0.15;
+          break;
+        default:
+          break;
+      }
+    });
+
+    document.addEventListener('keyup', (event) => {
+      switch (event.code) {
+        case 'ArrowLeft':
+        case 'ArrowRight':
+          rotateY = 0;
+          break;
+        case 'ArrowUp':
+        case 'ArrowDown':
+          rotateX = 0;
+          break;
+        case 'KeyW':
+        case 'KeyS':
+          lightY = 0;
+          break;
+        case 'KeyA':
+        case 'KeyD':
+          lightX = 0;
+          break;
+        default:
+          break;
+      }
+    });
+
+    function selectCube() {
+      scene.remove(selectedObject);
+      cube = createCube();
+      selectedObject = cube;
+      scene.add(selectedObject);
+    }
+
+    function selectIcosahedron() {
+      scene.remove(selectedObject);
+      selectedObject = createSpikyIcosahedron();
+      scene.add(selectedObject);
+    }
+
+    function selectTorusKnot() {
+      scene.remove(selectedObject);
+      selectedObject = createTorusKnot();
+      scene.add(selectedObject);
+    }
+
+    function selectTorus() {
+      scene.remove(selectedObject);
+      selectedObject = createTorus();
+      scene.add(selectedObject);
+    }
+
+    function selectCone() {
+      scene.remove(selectedObject);
+      selectedObject = createCone();
+      scene.add(selectedObject);
+    }
+
+    function selectDodecahedron() {
+      scene.remove(selectedObject);
+      selectedObject = createDodecahedron();
+      scene.add(selectedObject);
+    }
+
+    function selectOctahedron() {
+      scene.remove(selectedObject);
+      selectedObject = createOctahedron();
+      scene.add(selectedObject);
+    }
+  
+
+    function selectTriangle() {
+      scene.remove(selectedObject);
+      selectedObject = createTriangle();
+      scene.add(selectedObject);
+    }
+
+    function selectParallelepiped() {
+      scene.remove(selectedObject);
+      selectedObject = createParallelepiped();
+      scene.add(selectedObject);
+  }
+
+    function toggleMenu() {
+      const menu = document.querySelector('.menu');
+      menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+    }
+
+    function openColorPicker() {
+      const colorPicker = document.getElementById('colorPicker');
+      colorPicker.click();
+    }
+
+    function changeObjectColor() {
+      const colorPicker = document.getElementById('colorPicker');
+      selectedObject.material.color.set(colorPicker.value);
+    }
+  </script>
+</body>
+</html>
